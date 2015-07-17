@@ -1,7 +1,5 @@
 package com.yo1000.apidoc.component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.yo1000.apidoc.model.Document;
 import com.yo1000.apidoc.model.Header;
 import com.yo1000.apidoc.model.Response;
@@ -23,9 +21,6 @@ public abstract class ApidocHandlerInterceptor extends HandlerInterceptorAdapter
     public void postHandle(HttpServletRequest request, HttpServletResponse response,
                            Object handler, ModelAndView modelAndView) throws Exception {
         super.postHandle(request, response, handler, modelAndView);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         String key = request.getRequestURL().toString();
 
@@ -52,5 +47,8 @@ public abstract class ApidocHandlerInterceptor extends HandlerInterceptorAdapter
 
             apidoc.getResponse().getHeaders().add(header);
         }
+
+        apidoc.getResponse().setStatus(response.getStatus());
+        apidoc.getResponse().setContentType(response.getContentType());
     }
 }

@@ -1,7 +1,5 @@
 package com.yo1000.apidoc.component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.yo1000.apidoc.model.*;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -44,8 +42,6 @@ public abstract class ApidocAdvice {
         RequestMapping classReqMap = (RequestMapping) methodSignature.getDeclaringType().getAnnotation(RequestMapping.class);
 
         Document apidoc = new Document();
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         Request apiReq = new Request();
         apidoc.setRequest(apiReq);
@@ -55,7 +51,7 @@ public abstract class ApidocAdvice {
 
         Response apiResp = new Response();
         apidoc.setResponse(apiResp);
-        apiResp.setBody(objectMapper.writeValueAsString(o));
+        apiResp.setBody(o);
         apiResp.setHeaders(new ArrayList<Header>());
 
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder

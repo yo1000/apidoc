@@ -6,7 +6,7 @@
 
     <groupId>com.yo1000</groupId>
     <artifactId>apidoc</artifactId>
-    <version>0.1.0-BETA</version>
+    <version>0.2.0.BETA</version>
 
     <properties>
         <spring.version>4.1.5.RELEASE</spring.version>
@@ -25,11 +25,6 @@
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjtools</artifactId>
             <version>${aspectj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

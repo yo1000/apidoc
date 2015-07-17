@@ -3,7 +3,6 @@ package com.yo1000.apidoc.component;
 import com.yo1000.apidoc.model.Document;
 import com.yo1000.apidoc.model.Header;
 import com.yo1000.apidoc.model.Response;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +17,9 @@ public abstract class ApidocHandlerInterceptor extends HandlerInterceptorAdapter
     public abstract ConcurrentHashMap<String, Document> getDocumentMap();
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response,
-                           Object handler, ModelAndView modelAndView) throws Exception {
-        super.postHandle(request, response, handler, modelAndView);
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+                                Object handler, Exception ex) throws Exception {
+        super.afterCompletion(request, response, handler, ex);
 
         String key = request.getRequestURL().toString();
 
@@ -35,7 +34,7 @@ public abstract class ApidocHandlerInterceptor extends HandlerInterceptorAdapter
         }
 
         if (apidoc.getResponse().getHeaders() == null) {
-            apidoc.getRequest().setHeaders(new ArrayList<Header>());
+            apidoc.getResponse().setHeaders(new ArrayList<Header>());
         }
 
         for (String name : response.getHeaderNames()) {

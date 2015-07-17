@@ -41,18 +41,18 @@ public abstract class ApidocAdvice {
 
         RequestMapping classReqMap = (RequestMapping) methodSignature.getDeclaringType().getAnnotation(RequestMapping.class);
 
-        Document apidoc = new Document();
+        Document document = new Document();
 
-        Request apiReq = new Request();
-        apidoc.setRequest(apiReq);
-        apiReq.setEndpoint(this.makeEndpoint(classReqMap, methodReqMap));
-        apiReq.setParameters(this.mekeParameters(methodSignature));
-        apiReq.setHeaders(this.mekeHeaders(methodSignature));
+        Request docReq = new Request();
+        document.setRequest(docReq);
+        docReq.setEndpoint(this.makeEndpoint(classReqMap, methodReqMap));
+        docReq.setParameters(this.mekeParameters(methodSignature));
+        docReq.setHeaders(this.mekeHeaders(methodSignature));
 
-        Response apiResp = new Response();
-        apidoc.setResponse(apiResp);
-        apiResp.setBody(o);
-        apiResp.setHeaders(new ArrayList<Header>());
+        Response docResp = new Response();
+        document.setResponse(docResp);
+        docResp.setBody(o);
+        docResp.setHeaders(new ArrayList<Header>());
 
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
                 .currentRequestAttributes();
@@ -60,7 +60,7 @@ public abstract class ApidocAdvice {
         HttpServletRequest request = attrs.getRequest();
         String key = request.getRequestURL().toString();
 
-        this.getDocumentMap().put(key, apidoc);
+        this.getDocumentMap().put(key, document);
 
         return o;
     }

@@ -16,6 +16,7 @@
 
     <properties>
         <apache.httpclient.version>4.3.6</apache.httpclient.version>
+        <internal.repo.directory>/Users/yoichi.kikuchi/Repositories/maven</internal.repo.directory>
     </properties>
 
     <dependencies>

@@ -7,6 +7,7 @@ import java.util.List;
  */
 public class Request {
     private String endpoint;
+    private List<String> methods;
     private List<Header> headers;
     private List<Parameter> parameters;
 
@@ -16,6 +17,14 @@ public class Request {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public List<String> getMethods() {
+        return methods;
+    }
+
+    public void setMethods(List<String> methods) {
+        this.methods = methods;
     }
 
     public List<Header> getHeaders() {

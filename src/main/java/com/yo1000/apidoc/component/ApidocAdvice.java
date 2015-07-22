@@ -4,10 +4,7 @@ import com.yo1000.apidoc.model.*;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -45,9 +42,10 @@ public abstract class ApidocAdvice {
 
         Request docReq = new Request();
         document.setRequest(docReq);
-        docReq.setEndpoint(this.makeEndpoint(classReqMap, methodReqMap));
-        docReq.setParameters(this.mekeParameters(methodSignature));
-        docReq.setHeaders(this.mekeHeaders(methodSignature));
+        docReq.setEndpoint(this.makeEndpoint(classReqMap, methodReqMap) + this.makeQueryParameter(methodSignature));
+        docReq.setMethods(this.makeMethods(classReqMap, methodReqMap));
+        docReq.setParameters(this.makeParameters(methodSignature));
+        docReq.setHeaders(this.makeHeaders(methodSignature));
 
         Response docResp = new Response();
         document.setResponse(docResp);
@@ -87,7 +85,61 @@ public abstract class ApidocAdvice {
         return endpoint.toString();
     }
 
-    protected List<Parameter> mekeParameters(MethodSignature methodSignature) {
+    protected List<String> makeMethods(RequestMapping typeRequestMapping, RequestMapping methodRequestMapping) {
+        List<String> methods = new ArrayList<String>();
+
+        for (RequestMethod method : typeRequestMapping.method()) {
+            if (methods.contains(method.name())) {
+                continue;
+            }
+
+            methods.add(method.name());
+        }
+
+        for (RequestMethod method : methodRequestMapping.method()) {
+            if (methods.contains(method.name())) {
+                continue;
+            }
+
+            methods.add(method.name());
+        }
+
+        if (methods.size() == 0) {
+            methods.add(RequestMethod.GET.name());
+        }
+
+        return methods;
+    }
+
+    protected String makeQueryParameter(MethodSignature methodSignature) {
+        Class<?>[] parameterTypes = methodSignature.getParameterTypes();
+        String[] parameterNames = methodSignature.getParameterNames();
+        Annotation[][] argsAnnos = methodSignature.getMethod().getParameterAnnotations();
+
+        StringBuilder b = new StringBuilder();
+
+        for (int i = 0; i < argsAnnos.length; i++) {
+            Annotation[] argAnnos = argsAnnos[i];
+
+            for (Annotation anno : argAnnos) {
+                if (!(anno instanceof RequestParam)) {
+                    continue;
+                }
+
+                RequestParam requestParam = (RequestParam) anno;
+
+                String name = requestParam.value() != null && !requestParam.value().isEmpty() ?
+                        requestParam.value() : parameterNames[i];
+
+                b.append(b.length() == 0 ? "?" : "&")
+                        .append(name).append("={").append(name).append("}");
+            }
+        }
+
+        return b.toString();
+    }
+
+    protected List<Parameter> makeParameters(MethodSignature methodSignature) {
         Class<?>[] parameterTypes = methodSignature.getParameterTypes();
         String[] parameterNames = methodSignature.getParameterNames();
         Annotation[][] argsAnnos = methodSignature.getMethod().getParameterAnnotations();
@@ -129,7 +181,7 @@ public abstract class ApidocAdvice {
         return apidocParameters;
     }
 
-    protected List<Header> mekeHeaders(MethodSignature methodSignature) {
+    protected List<Header> makeHeaders(MethodSignature methodSignature) {
         Class<?>[] parameterTypes = methodSignature.getParameterTypes();
         String[] parameterNames = methodSignature.getParameterNames();
         Annotation[][] argsAnnos = methodSignature.getMethod().getParameterAnnotations();

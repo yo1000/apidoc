@@ -3,17 +3,15 @@ package com.yo1000.apidoc.model;
 /**
  * Created by yoichi.kikuchi on 2015/07/16.
  */
-public class Header {
+public class ResponseHeader {
     private String name;
     private String value;
-    private boolean requires;
 
-    public Header() {}
+    public ResponseHeader() {}
 
-    public Header(String name, String value, boolean requires) {
+    public ResponseHeader(String name, String value, boolean requires) {
         this.name = name;
         this.value = value;
-        this.requires = requires;
     }
 
     public String getName() {
@@ -30,13 +28,5 @@ public class Header {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public boolean isRequires() {
-        return requires;
-    }
-
-    public void setRequires(boolean requires) {
-        this.requires = requires;
     }
 }

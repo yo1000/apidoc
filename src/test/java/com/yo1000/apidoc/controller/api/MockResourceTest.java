@@ -44,6 +44,33 @@ public class MockResourceTest {
                     }
                 }
         );
+
+        this.getRestTemplate().exchange(
+                "http://localhost:55555/mocks/{var1}/items/{var2}?param1={param1}&param2={param2}",
+                HttpMethod.GET, entity, String.class,
+                new HashMap<String, Object>() {
+                    {
+                        this.put("var1", "AAA");
+                        this.put("var2", "BBB");
+                        this.put("param1", 999);
+                        this.put("param2", 888);
+                    }
+                }
+        );
+
+        this.getRestTemplate().exchange(
+                "http://localhost:55555/mocks/{var1}/items/{var2}/details/{var3}?param1={param1}&param2={param2}",
+                HttpMethod.GET, entity, String.class,
+                new HashMap<String, Object>() {
+                    {
+                        this.put("var1", "XXX");
+                        this.put("var2", "YYY");
+                        this.put("var3", "ZZZ");
+                        this.put("param1", 123);
+                        this.put("param2", 456);
+                    }
+                }
+        );
     }
 
     public RestTemplate getRestTemplate() {

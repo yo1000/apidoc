@@ -4,7 +4,11 @@ import com.yo1000.apidoc.model.*;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -12,13 +16,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by yoichi.kikuchi on 2015/07/16.
  */
 public abstract class ApidocAdvice {
-    public abstract ConcurrentHashMap<String, Document> getDocumentMap();
+    public abstract DocumentBuilder getDocumentBuilder();
 
     public Object aroundResource(ProceedingJoinPoint joinPoint) throws Throwable {
         Object o = joinPoint.proceed();
@@ -36,29 +39,30 @@ public abstract class ApidocAdvice {
             return o;
         }
 
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = attrs.getRequest();
+
+        String url = request.getRequestURL().toString();
+        String query = request.getQueryString();
+        String key = url + (query != null ? ("?" + query) : "");
+
+        DocumentBuilder documentBuilder = this.getDocumentBuilder();
+        Request docReq = new Request();
+        Response docResp = new Response();
+
+        documentBuilder.put(key, docReq);
+        documentBuilder.put(key, docResp);
+
         RequestMapping classReqMap = (RequestMapping) methodSignature.getDeclaringType().getAnnotation(RequestMapping.class);
 
-        Document document = new Document();
-
-        Request docReq = new Request();
-        document.setRequest(docReq);
         docReq.setEndpoint(this.makeEndpoint(classReqMap, methodReqMap) + this.makeQueryParameter(methodSignature));
         docReq.setMethods(this.makeMethods(classReqMap, methodReqMap));
         docReq.setParameters(this.makeParameters(methodSignature));
         docReq.setHeaders(this.makeHeaders(methodSignature));
 
-        Response docResp = new Response();
-        document.setResponse(docResp);
-        docResp.setBody(o);
-        docResp.setHeaders(new ArrayList<Header>());
-
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder
-                .currentRequestAttributes();
-
-        HttpServletRequest request = attrs.getRequest();
-        String key = request.getRequestURL().toString();
-
-        this.getDocumentMap().put(key, document);
+        docResp.setRequestUrl(key);
+        docResp.setBody((o instanceof ResponseEntity) ? ((ResponseEntity) o).getBody() : o);
+        docResp.setHeaders(new ArrayList<ResponseHeader>());
 
         return o;
     }
@@ -181,33 +185,33 @@ public abstract class ApidocAdvice {
         return apidocParameters;
     }
 
-    protected List<Header> makeHeaders(MethodSignature methodSignature) {
+    protected List<RequestHeader> makeHeaders(MethodSignature methodSignature) {
         Class<?>[] parameterTypes = methodSignature.getParameterTypes();
         String[] parameterNames = methodSignature.getParameterNames();
         Annotation[][] argsAnnos = methodSignature.getMethod().getParameterAnnotations();
 
-        List<Header> apidocHeaders = new ArrayList<Header>();
+        List<RequestHeader> apidocRequestHeaders = new ArrayList<RequestHeader>();
 
         for (int i = 0; i < argsAnnos.length; i++) {
             Annotation[] argAnnos = argsAnnos[i];
-            Header apidocHeader = new Header();
+            RequestHeader apidocRequestHeader = new RequestHeader();
 
             for (Annotation anno : argAnnos) {
-                if (!(anno instanceof RequestHeader)) {
+                if (!(anno instanceof org.springframework.web.bind.annotation.RequestHeader)) {
                     continue;
                 }
 
-                RequestHeader requestHeader = (RequestHeader) anno;
+                org.springframework.web.bind.annotation.RequestHeader requestRequestHeader = (org.springframework.web.bind.annotation.RequestHeader) anno;
 
-                apidocHeader.setName(requestHeader.value() != null && !requestHeader.value().isEmpty() ?
-                        requestHeader.value() : parameterNames[i]);
-                apidocHeader.setValue(parameterTypes[i].getSimpleName().toLowerCase());
-                apidocHeader.setRequires(requestHeader.required());
+                apidocRequestHeader.setName(requestRequestHeader.value() != null && !requestRequestHeader.value().isEmpty() ?
+                        requestRequestHeader.value() : parameterNames[i]);
+                apidocRequestHeader.setValue(parameterTypes[i].getSimpleName().toLowerCase());
+                apidocRequestHeader.setRequires(requestRequestHeader.required());
 
-                apidocHeaders.add(apidocHeader);
+                apidocRequestHeaders.add(apidocRequestHeader);
             }
         }
 
-        return apidocHeaders;
+        return apidocRequestHeaders;
     }
 }

@@ -1,53 +1,55 @@
 package com.yo1000.apidoc.component;
 
-import com.yo1000.apidoc.model.Document;
-import com.yo1000.apidoc.model.Header;
+import com.yo1000.apidoc.model.DocumentBuilder;
 import com.yo1000.apidoc.model.Response;
+import com.yo1000.apidoc.model.ResponseHeader;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by yoichi.kikuchi on 2015/07/16.
  */
 public abstract class ApidocHandlerInterceptor extends HandlerInterceptorAdapter {
-    public abstract ConcurrentHashMap<String, Document> getDocumentMap();
+    public abstract DocumentBuilder getDocument();
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
                                 Object handler, Exception ex) throws Exception {
-        super.afterCompletion(request, response, handler, ex);
+        String url = request.getRequestURL().toString();
+        String query = request.getQueryString();
 
-        String key = request.getRequestURL().toString();
+        String key = url + (query != null ? ("?" + query) : "");
 
-        if (!this.getDocumentMap().containsKey(key)) {
+        if (!this.getDocument().containsKeyInRequestMap(key)) {
             return;
         }
 
-        Document apidoc = this.getDocumentMap().get(key);
-
-        if (apidoc.getResponse() == null) {
-            apidoc.setResponse(new Response());
+        if (!this.getDocument().containsKeyInResponseMap(key)) {
+            return;
         }
 
-        if (apidoc.getResponse().getHeaders() == null) {
-            apidoc.getResponse().setHeaders(new ArrayList<Header>());
+        Response docResp = this.getDocument().getResponse(key);
+
+        if (docResp.getHeaders() == null) {
+            docResp.setHeaders(new ArrayList<ResponseHeader>());
         }
 
         for (String name : response.getHeaderNames()) {
-            Header header = new Header();
-            header.setName(name);
+            ResponseHeader requestHeader = new ResponseHeader();
+            requestHeader.setName(name);
 
             String value =response.getHeader(name);
-            header.setValue(value != null ? value : "");
+            requestHeader.setValue(value != null ? value : "");
 
-            apidoc.getResponse().getHeaders().add(header);
+            docResp.getHeaders().add(requestHeader);
         }
 
-        apidoc.getResponse().setStatus(response.getStatus());
-        apidoc.getResponse().setContentType(response.getContentType());
+        docResp.setStatus(response.getStatus());
+        docResp.setContentType(response.getContentType());
+
+        super.afterCompletion(request, response, handler, ex);
     }
 }

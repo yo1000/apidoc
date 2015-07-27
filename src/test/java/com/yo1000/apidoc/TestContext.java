@@ -1,9 +1,9 @@
 package com.yo1000.apidoc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.yo1000.apidoc.component.ApidocConfigurer;
+import com.yo1000.apidoc.component.ApidocFormatHandlerInterceptor;
 import com.yo1000.apidoc.model.Document;
+import com.yo1000.apidoc.model.DocumentBuilder;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -13,10 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,25 +22,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @SpringBootApplication
 public class TestContext extends ApidocConfigurer {
     @Autowired
-    private ConcurrentHashMap<String, Document> documentMap;
+    private DocumentBuilder documentBuilder;
 
     @Override
-    public ConcurrentHashMap<String, Document> getDocumentMap() {
-        return documentMap;
+    public DocumentBuilder getDocumentBuilder() {
+        return documentBuilder;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new HandlerInterceptorAdapter() {
+        registry.addInterceptor(new ApidocFormatHandlerInterceptor() {
             @Override
-            public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-                                        Object handler, Exception ex) throws Exception {
-                super.afterCompletion(request, response, handler, ex);
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-                System.out.println(objectMapper.writeValueAsString(TestContext.this.getDocumentMap()));
+            public ConcurrentHashMap<String, Document> getDocumentMap() {
+                return TestContext.this.getDocumentBuilder().getDocumentMap();
             }
         });
 
@@ -51,8 +42,8 @@ public class TestContext extends ApidocConfigurer {
     }
 
     @Bean
-    public ConcurrentHashMap<String, Document> documentMap() {
-        return new ConcurrentHashMap<String, Document>();
+    public DocumentBuilder documentBuilder() {
+        return new DocumentBuilder();
     }
 
     @Bean

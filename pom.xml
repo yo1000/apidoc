@@ -16,7 +16,6 @@
 
     <properties>
         <apache.httpclient.version>4.3.6</apache.httpclient.version>
-        <internal.repo.directory>/Users/yoichi.kikuchi/Repositories/maven</internal.repo.directory>
     </properties>
 
     <dependencies>
@@ -40,30 +39,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <repository>
-            <id>internal.repo</id>
-            <name>Temporary Staging Repository</name>
-            <url>file://${internal.repo.directory}</url>
-        </repository>
-    </distributionManagement>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

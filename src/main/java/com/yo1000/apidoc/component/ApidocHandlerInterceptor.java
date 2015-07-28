@@ -1,6 +1,6 @@
 package com.yo1000.apidoc.component;
 
-import com.yo1000.apidoc.model.DocumentBuilder;
+import com.yo1000.apidoc.model.DocumentContainer;
 import com.yo1000.apidoc.model.Response;
 import com.yo1000.apidoc.model.ResponseHeader;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Created by yoichi.kikuchi on 2015/07/16.
  */
 public abstract class ApidocHandlerInterceptor extends HandlerInterceptorAdapter {
-    public abstract DocumentBuilder getDocument();
+    public abstract DocumentContainer getDocument();
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,

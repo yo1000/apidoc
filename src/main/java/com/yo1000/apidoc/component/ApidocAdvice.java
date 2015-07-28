@@ -21,7 +21,7 @@ import java.util.List;
  * Created by yoichi.kikuchi on 2015/07/16.
  */
 public abstract class ApidocAdvice {
-    public abstract DocumentBuilder getDocumentBuilder();
+    public abstract DocumentContainer getDocumentContainer();
 
     public Object aroundResource(ProceedingJoinPoint joinPoint) throws Throwable {
         Object o = joinPoint.proceed();
@@ -46,12 +46,12 @@ public abstract class ApidocAdvice {
         String query = request.getQueryString();
         String key = url + (query != null ? ("?" + query) : "");
 
-        DocumentBuilder documentBuilder = this.getDocumentBuilder();
+        DocumentContainer documentContainer = this.getDocumentContainer();
         Request docReq = new Request();
         Response docResp = new Response();
 
-        documentBuilder.put(key, docReq);
-        documentBuilder.put(key, docResp);
+        documentContainer.put(key, docReq);
+        documentContainer.put(key, docResp);
 
         RequestMapping classReqMap = (RequestMapping) methodSignature.getDeclaringType().getAnnotation(RequestMapping.class);
 

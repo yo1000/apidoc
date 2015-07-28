@@ -3,7 +3,7 @@ package com.yo1000.apidoc;
 import com.yo1000.apidoc.component.ApidocConfigurer;
 import com.yo1000.apidoc.component.ApidocFormatHandlerInterceptor;
 import com.yo1000.apidoc.model.Document;
-import com.yo1000.apidoc.model.DocumentBuilder;
+import com.yo1000.apidoc.model.DocumentContainer;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -22,11 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @SpringBootApplication
 public class TestContext extends ApidocConfigurer {
     @Autowired
-    private DocumentBuilder documentBuilder;
+    private DocumentContainer documentContainer;
 
     @Override
-    public DocumentBuilder getDocumentBuilder() {
-        return documentBuilder;
+    public DocumentContainer getDocumentContainer() {
+        return documentContainer;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class TestContext extends ApidocConfigurer {
         registry.addInterceptor(new ApidocFormatHandlerInterceptor() {
             @Override
             public ConcurrentHashMap<String, Document> getDocumentMap() {
-                return TestContext.this.getDocumentBuilder().getDocumentMap();
+                return TestContext.this.getDocumentContainer().getDocumentMap();
             }
         });
 
@@ -42,8 +42,8 @@ public class TestContext extends ApidocConfigurer {
     }
 
     @Bean
-    public DocumentBuilder documentBuilder() {
-        return new DocumentBuilder();
+    public DocumentContainer documentBuilder() {
+        return new DocumentContainer();
     }
 
     @Bean

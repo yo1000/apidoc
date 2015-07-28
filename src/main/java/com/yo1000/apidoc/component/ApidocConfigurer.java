@@ -1,6 +1,6 @@
 package com.yo1000.apidoc.component;
 
-import com.yo1000.apidoc.model.DocumentBuilder;
+import com.yo1000.apidoc.model.DocumentContainer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -10,14 +10,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  */
 @Configuration
 public abstract class ApidocConfigurer extends WebMvcConfigurerAdapter {
-    public abstract DocumentBuilder getDocumentBuilder();
+    public abstract DocumentContainer getDocumentContainer();
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new ApidocHandlerInterceptor() {
             @Override
-            public DocumentBuilder getDocument() {
-                return ApidocConfigurer.this.getDocumentBuilder();
+            public DocumentContainer getDocument() {
+                return ApidocConfigurer.this.getDocumentContainer();
             }
         });
 

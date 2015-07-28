@@ -1,7 +1,7 @@
 package com.yo1000.apidoc.component.aop;
 
 import com.yo1000.apidoc.component.ApidocAdvice;
-import com.yo1000.apidoc.model.DocumentBuilder;
+import com.yo1000.apidoc.model.DocumentContainer;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApidocAdvisor extends ApidocAdvice {
     @Autowired
-    private DocumentBuilder documentBuilder;
+    private DocumentContainer documentContainer;
 
     @Override
-    public DocumentBuilder getDocumentBuilder() {
-        return this.documentBuilder;
+    public DocumentContainer getDocumentContainer() {
+        return this.documentContainer;
     }
 
     @Around("execution(* com.yo1000.apidoc.controller.api.MockResource.*(..)) && " +

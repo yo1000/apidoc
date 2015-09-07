@@ -35,7 +35,7 @@ public abstract class ApidocAdvice {
 
         RequestMapping methodReqMap = methodSignature.getMethod().getAnnotation(RequestMapping.class);
 
-        if (methodReqMap == null || methodReqMap.value().length <= 0) {
+        if (methodReqMap == null || methodReqMap.value() == null) {
             return o;
         }
 
